@@ -1,0 +1,552 @@
+{
+  "info": {
+    "_postman_id": "e858bfa5-9ca6-48d9-a19b-fd7503591c2a",
+    "name": "Notes API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "login user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "177e9579-235d-4767-9c9c-665f7823cd0c",
+            "exec": [
+              "",
+              "try {",
+              "    const responseData = pm.response.json();",
+              "    if (responseData && responseData.data && responseData.data.token) {",
+              "        const token = responseData.data.token;",
+              "        pm.collectionVariables.set(\"authToken\", token);",
+              "        console.log(\"Token successfully stored\");",
+              "    } else {",
+              "        console.error(\"Token not found in response. Response structure:\", responseData);",
+              "    }",
+              "} catch (error) {",
+              "    console.error(\"Error extracting token from response:\", error.message);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "2a663c5f-c622-45e3-8012-7f9a8f13111f",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json",
+            "disabled": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "email",
+              "value": "aritrasasmal@gmail.com",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "India@596",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "create note",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "75952a3a-9c80-402f-a572-c94dff2a2710",
+            "exec": [
+              "let status = pm.response.code;\r",
+              "let json = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Validate response schema\", function () {\r",
+              "    const successSchema = {\r",
+              "        type: \"object\",\r",
+              "        required: [\"success\", \"status\", \"message\", \"data\"],\r",
+              "        properties: {\r",
+              "            success: { type: \"boolean\", const: true },\r",
+              "            status: { type: \"number\" },\r",
+              "            message: { type: \"string\" },\r",
+              "            data: {\r",
+              "                type: \"object\",\r",
+              "                required: [\r",
+              "                    \"id\",\r",
+              "                    \"title\",\r",
+              "                    \"description\",\r",
+              "                    \"category\",\r",
+              "                    \"completed\",\r",
+              "                    \"created_at\",\r",
+              "                    \"updated_at\",\r",
+              "                    \"user_id\"\r",
+              "                ],\r",
+              "                properties: {\r",
+              "                    id: { type: \"string\", pattern: \"^[a-f0-9]{24}$\" },\r",
+              "                    title: { type: \"string\" },\r",
+              "                    description: { type: \"string\" },\r",
+              "                    category: { type: \"string\" },\r",
+              "                    completed: { type: \"boolean\" },\r",
+              "                    created_at: { type: \"string\", format: \"date-time\" },\r",
+              "                    updated_at: { type: \"string\", format: \"date-time\" },\r",
+              "                    user_id: { type: \"string\", pattern: \"^[a-f0-9]{24}$\" }\r",
+              "                },\r",
+              "                additionalProperties: false\r",
+              "            }\r",
+              "        },\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    const errorSchema = {\r",
+              "        type: \"object\",\r",
+              "        required: [\"success\", \"status\", \"message\"],\r",
+              "        properties: {\r",
+              "            success: { type: \"boolean\", const: false },\r",
+              "            status: { type: \"number\" },\r",
+              "            message: { type: \"string\" }\r",
+              "        },\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    const json = pm.response.json();\r",
+              "\r",
+              "    if (json.success === true) {\r",
+              "        pm.response.to.have.jsonSchema(successSchema);\r",
+              "    } else {\r",
+              "        pm.response.to.have.jsonSchema(errorSchema);\r",
+              "    }\r",
+              "});\r",
+              "if (status === 200) {\r",
+              "    pm.test(\"Status code is 200\", function () {\r",
+              "        pm.expect(status).to.eql(200);\r",
+              "    });\r",
+              "    pm.collectionVariables.set(\"noteId\", json.data.id);\r",
+              "}\r",
+              "else {\r",
+              "    pm.test(\"Status code is not 200\", function () {\r",
+              "        pm.expect(status).to.not.eql(200);\r",
+              "    });\r",
+              "}\r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "f0c4e6c2-5cc9-4699-86c0-e10d2ee04b9f",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "4bcbf92f-d305-4341-b43c-3e9e2116db0a",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "title",
+              "value": "Test-note",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "To test the functionality of note",
+              "type": "text"
+            },
+            {
+              "key": "category",
+              "value": "Work",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/notes",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "get all notes",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "73e8a188-6dd1-4f74-bda8-350d952d2f16",
+            "exec": [
+              "let json = pm.response.json();\r",
+              "\r",
+              "pm.test('200 OK', () => pm.response.to.have.status(200));\r",
+              "pm.test('Notes Array', () => pm.expect(json.data).to.be.an('array'));\r",
+              "pm.test('Notes Array Length', () => pm.expect(json.data.length).to.be.greaterThan(0));\r",
+              "pm.test('Notes Array Elements', () => {\r",
+              "    json.data.forEach(note => {\r",
+              "        pm.expect(note).to.have.property('id');\r",
+              "        pm.expect(note).to.have.property('title');\r",
+              "        pm.expect(note).to.have.property('description');\r",
+              "        pm.expect(note).to.have.property('category');\r",
+              "        pm.expect(note).to.have.property('completed');\r",
+              "        pm.expect(note).to.have.property('created_at');\r",
+              "        pm.expect(note).to.have.property('updated_at');\r",
+              "        pm.expect(note).to.have.property('user_id');\r",
+              "    });\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "24ddf606-a568-4d29-bf05-f75f9aa39a58",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "cc712d55-2dcb-4d12-ae54-f271edaf69ad",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notes",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "get note by Id",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "3df96a16-f0c5-499b-b82d-7b868983977c",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "d8c01a09-9981-4381-abfc-464d8b13f306",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/notes/:noteId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notes",
+            ":noteId"
+          ],
+          "variable": [
+            {
+              "key": "noteId",
+              "value": "{{noteId}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "update note",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "8910eb81-7d7e-48db-9402-7965c4931ccc",
+            "exec": [
+              "let json = pm.response.json();\r",
+              "pm.test('200 OK',()=> pm.response.to.have.status(200))\r",
+              "// pm.test('Note updated successfully', () => pm.expect(json.message).to.eql('Note updated successfully'));\r",
+              "pm.test('Note title updated', () => pm.expect(json.data.title).to.equal('Updated Title'));\r",
+              "pm.test('Note description updated', () => pm.expect(json.data.description).to.equal('Updated Descritption'));"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "28dc3b7a-087d-489f-81f3-7a6c4d34751b",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "f55ad83d-b00f-4306-bd4f-a3b8d7e4ec41",
+      "request": {
+        "method": "PUT",
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "title",
+              "value": "Updated Title",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "Updated Descritption",
+              "type": "text"
+            },
+            {
+              "key": "category",
+              "value": "Home",
+              "type": "text"
+            },
+            {
+              "key": "completed",
+              "value": "true",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/notes/:noteId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notes",
+            ":noteId"
+          ],
+          "variable": [
+            {
+              "key": "noteId",
+              "value": "{{noteId}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "delete note",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "aa83a965-e868-4b49-baf7-cdcea8a94a86",
+            "exec": [
+              "pm.test('200 OK',()=> pm.response.to.have.status(200));\r",
+              "\r",
+              "let json = pm.response.json();\r",
+              "\r",
+              "pm.test('Note deleted succesfully',()=> pm.expect(json.message).to.include(\"Note successfully deleted\"))"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "812dae31-198c-41b4-be13-98da939e73bc",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "b60e8e94-24df-46d9-a79f-c229a1c36652",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/notes/:noteId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notes",
+            ":noteId"
+          ],
+          "variable": [
+            {
+              "key": "noteId",
+              "value": "{{noteId}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "delete note - deleted - 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "aa83a965-e868-4b49-baf7-cdcea8a94a86",
+            "exec": [
+              "let json = pm.response.json();\r",
+              "\r",
+              "pm.test('404 Not Found', () => pm.response.to.have.status(404));\r",
+              "pm.test('Note not found message', () => pm.expect(json.message).to.include(\"No note was found with the provided ID, Maybe it was deleted\"))"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "289ba94a-e324-4db7-839f-a2a11c108e73",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "642f2015-668f-42c9-8486-910b3ab7523b",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/notes/:noteId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notes",
+            ":noteId"
+          ],
+          "variable": [
+            {
+              "key": "noteId",
+              "value": "{{noteId}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "delete note - invalid - 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "aa83a965-e868-4b49-baf7-cdcea8a94a86",
+            "exec": [
+              "let json = pm.response.json();\r",
+              "\r",
+              "pm.test('400 Bad Request',()=> pm.response.to.have.status(400));\r",
+              "pm.test('Note not present',()=> pm.expect(json.message).to.include(\"Note ID must be a valid ID\"))"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "e3152307-692d-41f3-b299-ac1de3e16c0c",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "id": "7c9b1056-0c4e-44b4-bf0d-40406edf5aa6",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/notes/:noteId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "notes",
+            ":noteId"
+          ],
+          "variable": [
+            {
+              "key": "noteId",
+              "value": "12345"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "{{authToken}}",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "x-auth-token",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "id": "a4b64fc9-9fc0-430b-af16-7be3a26a5a33",
+      "key": "authToken",
+      "value": ""
+    },
+    {
+      "id": "7e80e370-883d-40e6-8419-851b25c46c75",
+      "key": "noteId",
+      "value": ""
+    }
+  ]
+}
